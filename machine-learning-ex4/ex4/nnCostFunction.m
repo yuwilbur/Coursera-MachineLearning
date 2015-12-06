@@ -62,9 +62,9 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-labels = eye(10);
-y = [y zeros(size(y),9)];
-for c=1:10
+labels = eye(num_labels);
+y = [y zeros(size(y),num_labels - 1)];
+for c=1:num_labels
   for i=1:size(y,1)
     if y(i,1) == c
       y(i,:) = labels(c,:);
@@ -72,41 +72,37 @@ for c=1:10
   end
 end
 
-a1 = [ones(m, 1) X];
-a2 = sigmoid(a1 * Theta1');
+a1 = [ones(size(X, 1), 1) X];
+z1 = a1 * Theta1';
+a2 = sigmoid(z1);
+
 a2 = [ones(size(a2, 1), 1) a2];
-a3 = sigmoid(a2 * Theta2');
+z2 = a2 * Theta2';
+a3 = sigmoid(z2);
+
 h = a3;
 
-K = 10;
-for i = 1:m
-  for k = 1:K
-    J += -y(i,k) * log(h(i,k)) - (1 - y(i,k)) * log(1 - h(i,k));
-  end
-end
-J = (1 / m) * J;
+J = (1 / m) * sum((-y .* log(h) - (1 - y) .* log(1 - h))(:));
 
 regTheta1 = Theta1;
 regTheta1(:,1) = 0;
 regTheta2 = Theta2;
 regTheta2(:,1) = 0;
-lambda = 1;
-J += (lambda / (2*m)) * (sum((regTheta1 .* regTheta1)(:)) + sum((regTheta2 .* regTheta2)(:)));
+J = J + (lambda / (2*m)) * (sum((regTheta1 .* regTheta1)(:)) + sum((regTheta2 .* regTheta2)(:)));
 
-magic(3) * magic(4);
+d3 = a3 - y;
+d2 = (d3 .* sigmoidGradient(z2)) * Theta2;
+d2 = d2(:,2:end);
 
+Theta2_grad_reg = lambda * Theta2;
+Theta2_grad_reg(:, 1) = 0;
+Theta2_grad = d3' * a2;
+Theta2_grad = (1/m) * Theta2_grad + Theta2_grad_reg;
 
-
-
-
-
-
-
-
-
-
-
-
+Theta1_grad_reg = lambda * Theta1;
+Theta1_grad_reg(:, 1) = 0;
+Theta1_grad = d2' * a1;
+Theta1_grad = (1/m) * Theta1_grad + Theta1_grad_reg;
 
 
 
@@ -116,6 +112,5 @@ magic(3) * magic(4);
 
 % Unroll gradients
 grad = [Theta1_grad(:) ; Theta2_grad(:)];
-
 
 end
