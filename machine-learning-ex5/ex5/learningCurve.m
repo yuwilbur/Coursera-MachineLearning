@@ -8,6 +8,7 @@ function [error_train, error_val] = ...
 %       it returns two vectors of the same length - error_train and 
 %       error_val. Then, error_train(i) contains the training error for
 %       i examples (and similarly for error_val(i)).
+
 %
 %   In this function, you will compute the train and test errors for
 %   dataset sizes from 1 up to m. In practice, when working with larger
@@ -51,9 +52,20 @@ error_val   = zeros(m, 1);
 %       end
 %
 
+
 % ---------------------- Sample Solution ----------------------
 
+%options = optimset('GradObj', 'on', 'MaxIter', 50);
+%theta_train = fmincg(@(t)lrCostFunction(X, (y == c), t, lambda), initial_theta, options);
+for i=1:m
+  theta = trainLinearReg(X(1:i, :), y(1:i), lambda);
+  [error_train(i), ~] = linearRegCostFunction(X(1:i, :), y(1:i), theta, 0);
+  [error_val(i), ~] = linearRegCostFunction(Xval, yval, theta, 0);
+end
 
+%J_error = lrCostFunction(X, (y == c), lambda);
+
+%fmincg(@(t)lrCostFunction(t, X, (y == c), lambda), initial_theta, options);
 
 
 
