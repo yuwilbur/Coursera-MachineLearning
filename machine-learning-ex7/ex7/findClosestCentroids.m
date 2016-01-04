@@ -21,13 +21,15 @@ idx = zeros(size(X,1), 1);
 % Note: You can use a for-loop over the examples to compute this.
 %
 
+for i=1:K
+  X_distance = X - centroids(i,:);
+  X_distances(:,i) = sqrt(sum((X_distance .* X_distance)')');
+end
 
-
-
-
+[~,idx] = min(X_distances');
+idx = idx';
 
 
 % =============================================================
 
 end
-
